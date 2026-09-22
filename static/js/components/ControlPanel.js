@@ -12,17 +12,17 @@ export default {
                 </select>
 
                 <label>Feed Speed (1-10)</label>
-                <input type="number" v-model="settings.feed_speed" min="1" max="10">
+                <input type="number" v-model.number="settings.feed_speed" min="1" max="10" @blur="clampValues">
                 <label>Feed Acceleration (1-10)</label>
-                <input type="number" v-model="settings.feed_accel" min="1" max="10">
+                <input type="number" v-model.number="settings.feed_accel" min="1" max="10" @blur="clampValues">
 
                 <label>Cut Speed (1-10)</label>
-                <input type="number" v-model="settings.cut_speed" min="1" max="10">
+                <input type="number" v-model.number="settings.cut_speed" min="1" max="10" @blur="clampValues">
                 <label>Cut Acceleration (1-10)</label>
-                <input type="number" v-model="settings.cut_accel" min="1" max="10">
+                <input type="number" v-model.number="settings.cut_accel" min="1" max="10" @blur="clampValues">
 
                 <label>Quantity</label>
-                <input type="number" v-model="settings.quantity" min="1">
+                <input type="number" v-model.number="settings.quantity" min="1">
             </div>
 
             <div class="card">
@@ -43,10 +43,18 @@ export default {
             quantity: 50
         });
 
+        const clampValues = () => {
+            settings.value.feed_speed = Math.max(1, Math.min(10, settings.value.feed_speed));
+            settings.value.feed_accel = Math.max(1, Math.min(10, settings.value.feed_accel));
+            settings.value.cut_speed = Math.max(1, Math.min(10, settings.value.cut_speed));
+            settings.value.cut_accel = Math.max(1, Math.min(10, settings.value.cut_accel));
+        };
+
         const emitCommand = (endpoint) => {
+            clampValues();
             emit('start-command', endpoint, settings.value);
         };
 
-        return { settings, emitCommand };
+        return { settings, clampValues, emitCommand };
     }
 };

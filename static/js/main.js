@@ -9,19 +9,19 @@ const App = {
             <h2>Pad Machine Control</h2>
             
             <ControlPanel 
-                v-if="machineState === 'IDLE'" 
+                v-show="machineState === 'IDLE'" 
                 @start-command="sendCommand" 
             />
             
             <AutoMode 
-                v-else-if="machineState === 'AUTO_MODE'"
+                v-show="machineState === 'AUTO_MODE'"
                 :current="autoCurrent"
                 :target="autoTarget"
                 @stop-machine="stopMachine"
             />
             
             <ActionScreen 
-                v-else 
+                v-show="machineState !== 'IDLE' && machineState !== 'AUTO_MODE'" 
                 :state="machineState" 
                 @stop-machine="stopMachine"
             />

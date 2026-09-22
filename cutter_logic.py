@@ -84,9 +84,15 @@ def home_crosscut():
 def move_x_direction(pad_size_mm, speed_factor, accel_factor):
     global stop_requested
     if stop_requested: return
+    
+    speed_factor = max(1, min(10, speed_factor))
+    accel_factor = max(1, min(10, accel_factor))
+    
     target_steps = int(pad_size_mm * STEPS_PER_MM)
-    min_delay = max(500, int(3000 / speed_factor))     
-    start_delay = max(2000, int(10000 / accel_factor)) 
+    
+    # Map 1-10 UI input linearly to safe hardware delays
+    min_delay = 3000 - int((speed_factor - 1) * 277)
+    start_delay = 10000 - int((accel_factor - 1) * 888)
     
     print(f"Feeding {pad_size_mm}mm ({target_steps} steps)...")
     _execute_wave(X_STEP, X_DIR, 1, target_steps, start_delay, min_delay)
@@ -94,8 +100,13 @@ def move_x_direction(pad_size_mm, speed_factor, accel_factor):
 def perform_crosscut(speed_factor, accel_factor):
     global stop_requested
     if stop_requested: return
-    min_delay = max(500, int(3000 / speed_factor))
-    start_delay = max(2000, int(10000 / accel_factor))
+    
+    speed_factor = max(1, min(10, speed_factor))
+    accel_factor = max(1, min(10, accel_factor))
+    
+    # Map 1-10 UI input linearly to safe hardware delays
+    min_delay = 3000 - int((speed_factor - 1) * 277)
+    start_delay = 10000 - int((accel_factor - 1) * 888)
     
     print("Cutting forward...")
     _execute_wave(CC_STEP, CC_DIR, 1, MAX_CROSSCUT_STEPS, start_delay, min_delay)
