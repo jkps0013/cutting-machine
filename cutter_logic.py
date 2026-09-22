@@ -91,7 +91,8 @@ def move_x_direction(pad_size_mm, speed_factor, accel_factor):
     target_steps = int(pad_size_mm * STEPS_PER_MM)
     
     # Map 1-10 UI input linearly to safe hardware delays
-    min_delay = 3000 - int((speed_factor - 1) * 277)
+    min_delay = 3000 - int((speed_factor - 1) * 316)
+    # Accel 1 = 10000us, Accel 10 = 2000us
     start_delay = 10000 - int((accel_factor - 1) * 888)
     
     print(f"Feeding {pad_size_mm}mm ({target_steps} steps)...")
@@ -105,7 +106,8 @@ def perform_crosscut(speed_factor, accel_factor):
     accel_factor = max(1, min(10, accel_factor))
     
     # Map 1-10 UI input linearly to safe hardware delays
-    min_delay = 3000 - int((speed_factor - 1) * 277)
+    # Speed 10 is now unlocked to 156us (High Speed!)
+    min_delay = 3000 - int((speed_factor - 1) * 316)
     start_delay = 10000 - int((accel_factor - 1) * 888)
     
     print("Cutting forward...")
