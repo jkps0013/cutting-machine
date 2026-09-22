@@ -17,7 +17,7 @@ export default {
         const buttonText = ref("STOP MACHINE");
         
         const stop = () => {
-            buttonText.value = "Stopping...";
+            buttonText.value = "Stop";
             emit('stop-machine');
         };
         
