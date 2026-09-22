@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pad Machine Control</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; max-width: 500px; margin: auto; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        select, input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; margin-top: 15px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-home { background: #ff9800; color: white; }
+        .btn-test { background: #2196F3; color: white; }
+        .btn-auto { background: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+
+    <h2>Pad Machine Control</h2>
+
+    <div class="card">
+        <label>Tracepad Size</label>
+        <select id="padSize">
+            <option value="12.7">Small (12.7mm)</option>
+            <option value="30.0">Medium (30mm)</option>
+            <option value="42.0">Large (42mm)</option>
+        </select>
+
+        <label>Feed Speed (1-10)</label>
+        <input type="number" id="feed_speed" value="8" min="1" max="10">
+
+        <label>Feed Acceleration (1-10)</label>
+        <input type="number" id="feed_accel" value="8" min="1" max="10">
+
+        <label>Cut Speed (1-10)</label>
+        <input type="number" id="cut_speed" value="5" min="1" max="10">
+
+        <label>Cut Acceleration (1-10)</label>
+        <input type="number" id="cut_accel" value="5" min="1" max="10">
+
+        <label>Quantity</label>
+        <input type="number" id="quantity" value="50" min="1">
+    </div>
+
+    <div class="card">
+        <button class="btn-home" onclick="sendCommand('/api/home')">1. Home Crosscut</button>
+        <button class="btn-test" onclick="sendCommand('/api/test_x')">Test: Feed X-Direction</button>
+        <button class="btn-test" onclick="sendCommand('/api/test_crosscut')">Test: One Crosscut</button>
+        <button class="btn-auto" onclick="sendCommand('/api/auto')">Start Auto Mode</button>
+    </div>
+
+    <script>
+        function sendCommand(endpoint) {
+            const data = {
+                size: document.getElementById('padSize').value,
+                feed_speed: document.getElementById('feed_speed').value,
+                feed_accel: document.getElementById('feed_accel').value,
+                cut_speed: document.getElementById('cut_speed').value,
+                cut_accel: document.getElementById('cut_accel').value,
+                quantity: document.getElementById('quantity').value
+            };
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => alert(data.status))
+              .catch(err => alert("Error communicating with machine."));
+        }
+    </script>
+</body>
+</html>
