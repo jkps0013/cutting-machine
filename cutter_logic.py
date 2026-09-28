@@ -68,7 +68,7 @@ def _execute_wave(step_pin, dir_pin, direction, total_steps, start_delay_us, min
 def home_crosscut():
     global stop_requested
     print("Homing crosscut...")
-    pi.write(CC_DIR, 0) # Set to homing direction
+    pi.write(CC_DIR, 1) # Set to homing direction
     
     # Step slowly until switch goes HIGH (pressed / connection broken)
     while pi.read(CC_LIMIT) == 0:
@@ -110,11 +110,11 @@ def perform_crosscut(speed_factor, accel_factor):
     start_delay = 10000 - int((accel_factor - 1) * 888)
     
     print("Cutting forward...")
-    _execute_wave(CC_STEP, CC_DIR, 1, MAX_CROSSCUT_STEPS, start_delay, min_delay)
+    _execute_wave(CC_STEP, CC_DIR, 0, MAX_CROSSCUT_STEPS, start_delay, min_delay)
     if stop_requested: return
     
     print("Returning home...")
-    _execute_wave(CC_STEP, CC_DIR, 0, MAX_CROSSCUT_STEPS, start_delay, min_delay)
+    _execute_wave(CC_STEP, CC_DIR, 1, MAX_CROSSCUT_STEPS, start_delay, min_delay)
     if stop_requested: return
     
     home_crosscut()
