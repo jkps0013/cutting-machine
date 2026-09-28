@@ -26,8 +26,8 @@ STEPS_PER_MM = FEED_MICROSTEPS / FEED_WHEEL_CIRCUMFERENCE
 # 2. CROSSCUT MOTOR (Linear Actuator)
 # You need 9 revolutions to travel 120mm.
 CC_REVOLUTIONS = 9
-# 200 steps for 1 revolution (Full step)
-CC_STEPS = 200 
+# 400 steps for 1 revolution (Full step)
+CC_STEPS = 400 
 MAX_CROSSCUT_STEPS = int(CC_REVOLUTIONS * CC_STEPS) # 1800 steps total
 
 # Initialize pigpio daemon connection
