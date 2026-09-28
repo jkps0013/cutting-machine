@@ -166,7 +166,7 @@ def perform_crosscut(speed_factor, accel_factor):
     
     # Map 1-10 UI input to EXTREMELY SLOW limits for testing
     # Speed 10 = 3000us (333 pulses/sec). Speed 1 = 6000us (166 pulses/sec)
-    min_delay = 6000 - int((speed_factor - 1) * 500)
+    min_delay = 6000 - int((speed_factor - 1) * 2000)
     start_delay = 12000 - int((accel_factor - 1) * 800)
     
     print("Cutting forward...")
