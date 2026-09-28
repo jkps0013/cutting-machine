@@ -50,6 +50,8 @@ def _execute_wave(step_pin, dir_pin, direction, total_steps, start_delay_us, min
 
     pi.write(dir_pin, direction)
     pulses = []
+    wave_ids = []
+    
     ramp_steps = int(total_steps * 0.2) # 20% ramp up, 20% ramp down
     
     for i in range(total_steps):
@@ -64,19 +66,35 @@ def _execute_wave(step_pin, dir_pin, direction, total_steps, start_delay_us, min
         pulses.append(pigpio.pulse(1<<step_pin, 0, int(delay/2)))
         pulses.append(pigpio.pulse(0, 1<<step_pin, int(delay/2)))
         
-    pi.wave_clear()
-    pi.wave_add_generic(pulses)
-    wave_id = pi.wave_create()
-    
-    if wave_id >= 0:
-        pi.wave_send_once(wave_id)
+        # When we hit 2000 pulses, create a chunk so we don't crash!
+        if len(pulses) >= 2000:
+            pi.wave_add_generic(pulses)
+            wid = pi.wave_create()
+            if wid >= 0:
+                wave_ids.append(wid)
+            pulses = [] # Reset for next chunk
+            
+    # Add any leftover pulses
+    if len(pulses) > 0:
+        pi.wave_add_generic(pulses)
+        wid = pi.wave_create()
+        if wid >= 0:
+            wave_ids.append(wid)
+            
+    if len(wave_ids) > 0:
+        # Chain all the chunks together seamlessly!
+        pi.wave_chain(wave_ids)
+        
         # Wait for hardware to finish, but poll the stop button
         while pi.wave_tx_busy(): 
             if stop_requested:
                 pi.wave_tx_stop() # Instantly kill the hardware wave
                 break
             time.sleep(0.05)
-        pi.wave_delete(wave_id)
+            
+        # Clean up memory
+        for wid in wave_ids:
+            pi.wave_delete(wid)
 
 def home_crosscut():
     global stop_requested
@@ -174,3 +192,5 @@ def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_
         
     machine_state = "IDLE"
     stop_requested = False
+
+
