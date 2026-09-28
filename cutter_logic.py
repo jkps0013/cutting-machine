@@ -15,7 +15,7 @@ CC_LIMIT = 14      # Crosscut Limit Switch
 
 # Constants based on hardware definitions
 STEPS_PER_MM = 6.366
-MAX_CROSSCUT_STEPS = 5000  # Update this after measuring your physical rail
+MAX_CROSSCUT_STEPS = 1000  # Update this after measuring your physical rail
 
 # Initialize pigpio daemon connection
 pi = pigpio.pi()
