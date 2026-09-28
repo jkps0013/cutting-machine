@@ -7,12 +7,11 @@ auto_target = 0
 auto_current = 0
 stop_requested = False
 
-# Pin Definitions
 X_STEP = 17
 X_DIR = 27
-CC_STEP = 22       # Crosscut Step
-CC_DIR = 23        # Crosscut Direction
-CC_LIMIT = 24      # Crosscut Limit Switch
+CC_STEP = 35       # Crosscut Step
+CC_DIR = 37        # Crosscut Direction red wire
+CC_LIMIT = 8      # Crosscut Limit Switch
 
 # Constants based on hardware definitions
 STEPS_PER_MM = 6.366
