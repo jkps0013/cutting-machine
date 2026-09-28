@@ -102,10 +102,9 @@ def move_x_direction(pad_size_mm, speed_factor, accel_factor):
     
     target_steps = int(pad_size_mm * STEPS_PER_MM)
     
-    # Map 1-10 UI input linearly to safe hardware delays
-    min_delay = 3000 - int((speed_factor - 1) * 316)
-    # Accel 1 = 10000us, Accel 10 = 2000us
-    start_delay = 10000 - int((accel_factor - 1) * 888)
+    # Map 1-10 UI input to EXTREMELY SLOW limits for testing
+    min_delay = 6000 - int((speed_factor - 1) * 333)
+    start_delay = 12000 - int((accel_factor - 1) * 666)
     
     print(f"Feeding {pad_size_mm}mm ({target_steps} steps)...")
     _execute_wave(X_STEP, X_DIR, 1, target_steps, start_delay, min_delay)
@@ -117,10 +116,10 @@ def perform_crosscut(speed_factor, accel_factor):
     speed_factor = max(1, min(10, speed_factor))
     accel_factor = max(1, min(10, accel_factor))
     
-    # Map 1-10 UI input linearly to safe hardware delays
-    # Speed 10 is now unlocked to 156us (High Speed!)
-    min_delay = 3000 - int((speed_factor - 1) * 316)
-    start_delay = 10000 - int((accel_factor - 1) * 888)
+    # Map 1-10 UI input to EXTREMELY SLOW limits for testing
+    # Speed 10 = 3000us (333 pulses/sec). Speed 1 = 6000us (166 pulses/sec)
+    min_delay = 6000 - int((speed_factor - 1) * 333)
+    start_delay = 12000 - int((accel_factor - 1) * 666)
     
     print("Cutting forward...")
     _execute_wave(CC_STEP, CC_DIR, 0, MAX_CROSSCUT_STEPS, start_delay, min_delay)
