@@ -78,7 +78,7 @@ def _execute_wave(step_pin, dir_pin, direction, total_steps, start_delay_us, min
     pulses = []
     wave_ids = []
     
-    ramp_steps = int(total_steps * 0.2) # 20% ramp up, 20% ramp down
+    ramp_steps = int(total_steps * 0.05) # 5% ramp up, 20% ramp down
     
     for i in range(total_steps):
         if i < ramp_steps:
