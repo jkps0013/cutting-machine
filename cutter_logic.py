@@ -9,9 +9,9 @@ stop_requested = False
 
 X_STEP = 17
 X_DIR = 27
-CC_STEP = 35       # Crosscut Step
-CC_DIR = 37        # Crosscut Direction red wire
-CC_LIMIT = 8      # Crosscut Limit Switch
+CC_STEP = 19       # Crosscut Step
+CC_DIR = 26        # Crosscut Direction red wire
+CC_LIMIT = 14      # Crosscut Limit Switch
 
 # Constants based on hardware definitions
 STEPS_PER_MM = 6.366
