@@ -13,9 +13,22 @@ CC_STEP = 19       # Crosscut Step
 CC_DIR = 26        # Crosscut Direction red wire
 CC_LIMIT = 14      # Crosscut Limit Switch
 
-# Constants based on hardware definitions
-STEPS_PER_MM = 6.366
-MAX_CROSSCUT_STEPS = 1000  # Update this after measuring your physical rail
+# --- HARDWARE CALIBRATION ---
+
+# 1. FEED MOTOR (X-Axis)
+FEED_WHEEL_DIAMETER_MM = 80.0
+FEED_WHEEL_CIRCUMFERENCE = FEED_WHEEL_DIAMETER_MM * 3.14159
+FEED_MICROSTEPS = 200 # 200 steps for 1 revolution (Full step)
+
+# Calculate steps per millimeter dynamically: (200 / 251.3) = 0.795 steps per mm
+STEPS_PER_MM = FEED_MICROSTEPS / FEED_WHEEL_CIRCUMFERENCE
+
+# 2. CROSSCUT MOTOR (Linear Actuator)
+# You need 9 revolutions to travel 120mm.
+CC_REVOLUTIONS = 9
+# 200 steps for 1 revolution (Full step)
+CC_STEPS = 200 
+MAX_CROSSCUT_STEPS = int(CC_REVOLUTIONS * CC_STEPS) # 1800 steps total
 
 # Initialize pigpio daemon connection
 pi = pigpio.pi()
