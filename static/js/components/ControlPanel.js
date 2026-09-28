@@ -16,10 +16,10 @@ export default {
                 <label>Feed Acceleration (1-10)</label>
                 <input type="number" v-model.number="settings.feed_accel" min="1" max="10" @blur="clampValues">
 
-                <label>Cut Speed (1-10)</label>
-                <input type="number" v-model.number="settings.cut_speed" min="1" max="10" @blur="clampValues">
-                <label>Cut Acceleration (1-10)</label>
-                <input type="number" v-model.number="settings.cut_accel" min="1" max="10" @blur="clampValues">
+                
+
+                                <label>Steps per mm (Feed Calibration)</label>
+                <input type="number" v-model.number="settings.steps_per_mm" step="0.001" min="0.001">
 
                 <label>Quantity</label>
                 <input type="number" v-model.number="settings.quantity" min="1">
@@ -38,16 +38,15 @@ export default {
             size: "30.0",
             feed_speed: 8,
             feed_accel: 8,
-            cut_speed: 5,
-            cut_accel: 5,
+            steps_per_mm: 0.795,
             quantity: 50
         });
 
         const clampValues = () => {
             settings.value.feed_speed = Math.max(1, Math.min(10, settings.value.feed_speed));
             settings.value.feed_accel = Math.max(1, Math.min(10, settings.value.feed_accel));
-            settings.value.cut_speed = Math.max(1, Math.min(10, settings.value.cut_speed));
-            settings.value.cut_accel = Math.max(1, Math.min(10, settings.value.cut_accel));
+            
+            
         };
 
         const emitCommand = (endpoint) => {
@@ -58,3 +57,4 @@ export default {
         return { settings, clampValues, emitCommand };
     }
 };
+

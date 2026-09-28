@@ -42,28 +42,28 @@ def home():
 def test_x():
     if cutter_logic.machine_state != "IDLE": return jsonify({"status": "Busy"})
     data = request.json
-    run_in_background(cutter_logic.run_test_x, float(data['size']), float(data['feed_speed']), float(data['feed_accel']))
+    steps_per_mm = float(data.get('steps_per_mm', 0.795))
+    run_in_background(cutter_logic.run_test_x, float(data['size']), float(data['feed_speed']), float(data['feed_accel']), steps_per_mm)
     return jsonify({"status": "X-Direction test started"})
 
 @app.route('/api/test_crosscut', methods=['POST'])
 def test_crosscut():
     if cutter_logic.machine_state != "IDLE": return jsonify({"status": "Busy"})
-    data = request.json
-    run_in_background(cutter_logic.run_test_crosscut, float(data['cut_speed']), float(data['cut_accel']))
+    run_in_background(cutter_logic.run_test_crosscut)
     return jsonify({"status": "Crosscut test started"})
 
 @app.route('/api/auto', methods=['POST'])
 def auto():
     if cutter_logic.machine_state != "IDLE": return jsonify({"status": "Busy"})
     data = request.json
+    steps_per_mm = float(data.get('steps_per_mm', 0.795))
     run_in_background(
         cutter_logic.auto_mode, 
         float(data['size']), 
         float(data['feed_speed']), 
         float(data['feed_accel']),
-        float(data['cut_speed']), 
-        float(data['cut_accel']),
-        int(data['quantity'])
+        int(data['quantity']),
+        steps_per_mm
     )
     return jsonify({"status": "Auto mode started"})
 

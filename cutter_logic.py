@@ -30,7 +30,7 @@ STEPS_PER_MM = FEED_MICROSTEPS / FEED_WHEEL_CIRCUMFERENCE
 CC_REVOLUTIONS = 9
 # 400 steps for 1 revolution (Full step)
 CC_STEPS = 400 
-MAX_CROSSCUT_STEPS = int(CC_REVOLUTIONS * CC_STEPS) # 1800 steps total
+MAX_CROSSCUT_STEPS = int(CC_REVOLUTIONS * CC_STEPS) 
 
 # Initialize pigpio daemon connection
 pi = pigpio.pi()
@@ -137,14 +137,14 @@ def home_crosscut():
     if not stop_requested:
         print("Crosscut homed.")
 
-def move_x_direction(pad_size_mm, speed_factor, accel_factor):
+def move_x_direction(pad_size_mm, speed_factor, accel_factor, steps_per_mm):
     global stop_requested
     if stop_requested: return
     
     speed_factor = max(1, min(10, speed_factor))
     accel_factor = max(1, min(10, accel_factor))
     
-    target_steps = int(pad_size_mm * STEPS_PER_MM)
+    target_steps = int(pad_size_mm * steps_per_mm)
     
     # Map 1-10 UI input to EXTREMELY SLOW limits for testing
     min_delay = 6000 - int((speed_factor - 1) * 333)
@@ -153,19 +153,14 @@ def move_x_direction(pad_size_mm, speed_factor, accel_factor):
     print(f"Feeding {pad_size_mm}mm ({target_steps} steps)...")
     _execute_wave(X_STEP, X_DIR, 1, target_steps, start_delay, min_delay)
 
-def perform_crosscut(speed_factor, accel_factor):
+def perform_crosscut():
     global stop_requested
     if stop_requested: return
 
     print('Ensuring crosscut is home before starting...')
     home_crosscut()
     if stop_requested: return
-
-    speed_factor = max(1, min(10, speed_factor))
-    accel_factor = max(1, min(10, accel_factor))
     
-    # Map 1-10 UI input to EXTREMELY SLOW limits for testing
-    # Speed 10 = 3000us (333 pulses/sec). Speed 1 = 6000us (166 pulses/sec)
     min_delay = 675
     start_delay = 10200
     
@@ -189,23 +184,23 @@ def run_home():
     disable_cc()
     machine_state = "IDLE"
 
-def run_test_x(pad_size_mm, feed_speed, feed_accel):
+def run_test_x(pad_size_mm, feed_speed, feed_accel, steps_per_mm):
     global machine_state
     machine_state = "TESTING_X"
     enable_x()
-    move_x_direction(pad_size_mm, feed_speed, feed_accel)
+    move_x_direction(pad_size_mm, feed_speed, feed_accel, steps_per_mm)
     disable_x()
     machine_state = "IDLE"
 
-def run_test_crosscut(cut_speed, cut_accel):
+def run_test_crosscut():
     global machine_state
     machine_state = "TESTING_CROSSCUT"
     enable_cc()
-    perform_crosscut(cut_speed, cut_accel)
+    perform_crosscut()
     disable_cc()
     machine_state = "IDLE"
 
-def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_quantity):
+def auto_mode(pad_size_mm, feed_speed, feed_accel, target_quantity, steps_per_mm):
     global machine_state, auto_target, auto_current, stop_requested
     
     machine_state = "AUTO_MODE"
@@ -225,11 +220,12 @@ def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_
             break
             
         auto_current = current_pad + 1
-        move_x_direction(pad_size_mm, feed_speed, feed_accel)
-        perform_crosscut(cut_speed, cut_accel)
+        move_x_direction(pad_size_mm, feed_speed, feed_accel, steps_per_mm)
+        perform_crosscut()
         print(f"Progress: Cut {auto_current} of {auto_target}")
         
     disable_cc()
     disable_x()
     machine_state = "IDLE"
     stop_requested = False
+
