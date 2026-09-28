@@ -70,8 +70,8 @@ def home_crosscut():
     print("Homing crosscut...")
     pi.write(CC_DIR, 0) # Set to homing direction
     
-    # Step slowly until switch goes LOW (pressed)
-    while pi.read(CC_LIMIT) == 1:
+    # Step slowly until switch goes HIGH (pressed / connection broken)
+    while pi.read(CC_LIMIT) == 0:
         if stop_requested: break
         pi.write(CC_STEP, 1)
         time.sleep(0.002)
