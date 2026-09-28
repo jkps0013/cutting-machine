@@ -9,8 +9,10 @@ stop_requested = False
 
 X_STEP = 17
 X_DIR = 27
+X_EN = 22          # Physical Pin 15
 CC_STEP = 19       # Crosscut Step
 CC_DIR = 26        # Crosscut Direction red wire
+CC_EN = 23         # Physical Pin 16
 CC_LIMIT = 14      # Crosscut Limit Switch
 
 # --- HARDWARE CALIBRATION ---
@@ -39,10 +41,34 @@ if not pi.connected:
 # Setup Pins
 pi.set_mode(X_STEP, pigpio.OUTPUT)
 pi.set_mode(X_DIR, pigpio.OUTPUT)
+pi.set_mode(X_EN, pigpio.OUTPUT)
 pi.set_mode(CC_STEP, pigpio.OUTPUT)
 pi.set_mode(CC_DIR, pigpio.OUTPUT)
+pi.set_mode(CC_EN, pigpio.OUTPUT)
 pi.set_mode(CC_LIMIT, pigpio.INPUT)
 pi.set_pull_up_down(CC_LIMIT, pigpio.PUD_UP) # Internal pull-up for the switch
+
+# Disable motors by default so they run cool (1 = disabled, 0 = enabled)
+pi.write(X_EN, 1)
+pi.write(CC_EN, 1)
+
+def enable_x():
+    pi.write(X_EN, 0)
+    print("X-Axis enabled.")
+    time.sleep(0.05)
+
+def disable_x():
+    print("X-Axis disabled.")
+    pi.write(X_EN, 1)
+
+def enable_cc():
+    print("Crosscut enabled.")
+    pi.write(CC_EN, 0)
+    time.sleep(0.05)
+
+def disable_cc():
+    print("Crosscut disabled.")
+    pi.write(CC_EN, 1)
 
 def _execute_wave(step_pin, dir_pin, direction, total_steps, start_delay_us, min_delay_us):
     global stop_requested
@@ -130,7 +156,11 @@ def move_x_direction(pad_size_mm, speed_factor, accel_factor):
 def perform_crosscut(speed_factor, accel_factor):
     global stop_requested
     if stop_requested: return
-    
+
+    print('Ensuring crosscut is home before starting...')
+    home_crosscut()
+    if stop_requested: return
+
     speed_factor = max(1, min(10, speed_factor))
     accel_factor = max(1, min(10, accel_factor))
     
@@ -154,19 +184,25 @@ def perform_crosscut(speed_factor, accel_factor):
 def run_home():
     global machine_state
     machine_state = "HOMING"
+    enable_cc()
     home_crosscut()
+    disable_cc()
     machine_state = "IDLE"
 
 def run_test_x(pad_size_mm, feed_speed, feed_accel):
     global machine_state
     machine_state = "TESTING_X"
+    enable_x()
     move_x_direction(pad_size_mm, feed_speed, feed_accel)
+    disable_x()
     machine_state = "IDLE"
 
 def run_test_crosscut(cut_speed, cut_accel):
     global machine_state
     machine_state = "TESTING_CROSSCUT"
+    enable_cc()
     perform_crosscut(cut_speed, cut_accel)
+    disable_cc()
     machine_state = "IDLE"
 
 def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_quantity):
@@ -176,6 +212,9 @@ def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_
     auto_target = int(target_quantity)
     auto_current = 0
     stop_requested = False
+    
+    enable_cc()
+    enable_x()
     
     home_crosscut() 
     
@@ -190,7 +229,7 @@ def auto_mode(pad_size_mm, feed_speed, feed_accel, cut_speed, cut_accel, target_
         perform_crosscut(cut_speed, cut_accel)
         print(f"Progress: Cut {auto_current} of {auto_target}")
         
+    disable_cc()
+    disable_x()
     machine_state = "IDLE"
     stop_requested = False
-
-
